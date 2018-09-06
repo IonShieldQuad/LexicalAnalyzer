@@ -40,35 +40,42 @@ public class AnalyzerMain {
 
                         //Try to match each symbol in the dictionary
                         for (String symbol : symbols.symbolSet()) {
-                            if (inLine.indexOf(symbol) == 0) {
-                                matched = symbol;
-                                inLine = inLine.substring(matched.length());
-                                break;
+                            if (inLine.startsWith(symbol)) {
+                                if (matched == null || matched.length() < symbol.length()) {
+                                    matched = symbol;
+                                }
                             }
+                        }
+
+                        //Cuts off matched substring
+                        if (matched != null) {
+                            inLine = inLine.substring(matched.length());
                         }
 
                         //Tries to process unmatched substring as identifier or literal
                         if ((matched != null || inLine.length() == 0) && id != "") {
                             //String
                             if (id.charAt(0) == '\"' && id.charAt(id.length() - 1) == '\"') {
+                                symbols.addLiteral(id);
                                 outLine = addSpace(outLine);
                                 outLine += symbols.getLiteralCode();
-                                outLine = addSpace(outLine);
-                                outLine += id.substring(1, id.length() - 1);
+                                outLine += ".";
+                                outLine += symbols.getLiteral(id);
                             }
                             //Integer
                             else if (isDigit(id.charAt(0))) {
+                                symbols.addLiteral(id);
                                 outLine = addSpace(outLine);
                                 outLine += symbols.getLiteralCode();
-                                outLine = addSpace(outLine);
-                                outLine += id;
+                                outLine += ".";
+                                outLine += symbols.getLiteral(id);
                             }
                             //Identifier
                             else {
                                 symbols.addIdentifier(id);
                                 outLine = addSpace(outLine);
                                 outLine += symbols.getIdentifierCode();
-                                outLine = addSpace(outLine);
+                                outLine += ".";
                                 outLine += symbols.getIdentifier(id);
                             }
                             //Resets unmatched string
@@ -87,11 +94,13 @@ public class AnalyzerMain {
                         }
 
                     }
+                    //Writes a line
                     System.out.println(outLine);
                     writer.write(outLine);
                     writer.newLine();
                 }
             } while (inLine != null);
+            //Closes reader and writer after use
             reader.close();
             writer.close();
         }
