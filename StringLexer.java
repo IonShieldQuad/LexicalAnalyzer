@@ -53,6 +53,7 @@ public class StringLexer {
         return this.dic;
     }
 
+    /**Adds spaces around reserved symbols*/
     private String addSpaces(String inString) {
         String outString = "";
 
